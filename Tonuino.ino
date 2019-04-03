@@ -160,6 +160,8 @@ MFRC522::StatusCode status;
 #define buttonPause A0
 #define buttonUp A1
 #define buttonDown A2
+#define buttonVolUp A3
+#define buttonVolDown A4
 #define busyPin 4
 
 #define LONG_PRESS 1000
@@ -167,6 +169,8 @@ MFRC522::StatusCode status;
 Button pauseButton(buttonPause);
 Button upButton(buttonUp);
 Button downButton(buttonDown);
+Button volUpButton(buttonVolUp);
+Button volDownButton(buttonVolDown);
 bool ignorePauseButton = false;
 bool ignoreUpButton = false;
 bool ignoreDownButton = false;
@@ -188,6 +192,8 @@ void setup() {
   pinMode(buttonPause, INPUT_PULLUP);
   pinMode(buttonUp, INPUT_PULLUP);
   pinMode(buttonDown, INPUT_PULLUP);
+  pinMode(buttonVolUp, INPUT_PULLUP);
+  pinMode(buttonVolDown, INPUT_PULLUP);
 
   // Busy Pin
   pinMode(busyPin, INPUT);
@@ -225,6 +231,8 @@ void loop() {
     pauseButton.read();
     upButton.read();
     downButton.read();
+    volUpButton.read();
+    volDownButton.read();
 
     if (pauseButton.wasReleased()) {
       if (ignorePauseButton == false) {
@@ -249,27 +257,30 @@ void loop() {
       ignorePauseButton = true;
     }
 
-    if (upButton.pressedFor(LONG_PRESS)) {
-      Serial.println(F("Volume Up"));
-      mp3.increaseVolume();
-      ignoreUpButton = true;
-    } else if (upButton.wasReleased()) {
+    if (upButton.wasReleased()) {
       if (!ignoreUpButton)
         nextTrack(random(65536));
       else
         ignoreUpButton = false;
     }
 
-    if (downButton.pressedFor(LONG_PRESS)) {
-      Serial.println(F("Volume Down"));
-      mp3.decreaseVolume();
-      ignoreDownButton = true;
-    } else if (downButton.wasReleased()) {
+    if (downButton.wasReleased()) {
       if (!ignoreDownButton)
         previousTrack();
       else
         ignoreDownButton = false;
     }
+
+    if (VolUpButton.wasReleased()) {
+      Serial.println(F("Volume Up"));
+      mp3.increaseVolume();
+    }
+
+    if (VolDownButton.wasReleased()) {
+       Serial.println(F("Volume Down"));
+       mp3.decreaseVolume();
+    }
+
     // Ende der Buttons
   } while (!mfrc522.PICC_IsNewCardPresent());
 
